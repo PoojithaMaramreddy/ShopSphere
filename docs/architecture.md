@@ -2,50 +2,73 @@
 
 ## 1. Project Overview
 
-ShopSphere is a small e-commerce backend application designed for learning and demonstrating backend development using Python and MySQL.
+ShopSphere is a small e-commerce backend project built for learning backend development using Python and MySQL.
 
-The project will be developed incrementally and maintained using Git.
+The project focuses on understanding:
+
+* Relational database design
+* SQL and MySQL
+* Python database connectivity
+* Backend business logic
+* REST APIs
+* Authentication
+* Transactions
+* Validation
+* Testing
+* Git and version control
+
+The project will initially focus on the backend only. A frontend may be added later.
 
 ---
 
 ## 2. Project Goals
 
-* Build a functional e-commerce backend
-* Practice relational database design
-* Use MySQL constraints, relationships, triggers, and views
-* Connect Python to MySQL using PyMySQL
-* Build backend APIs
-* Implement customer and admin functionality
-* Maintain the project using Git throughout development
+The main goals of ShopSphere are:
+
+1. Design a proper relational database.
+2. Implement the database using MySQL.
+3. Connect Python with MySQL using PyMySQL.
+4. Build backend functionality using Python.
+5. Introduce FastAPI for REST API development.
+6. Implement user authentication and authorization.
+7. Implement products, categories, cart, and orders.
+8. Practice database constraints, triggers, views, and transactions.
+9. Test backend functionality.
+10. Maintain the project using Git and GitHub.
+
+The project should remain small enough to complete without becoming unnecessarily complex.
 
 ---
 
 ## 3. Technology Stack
 
-* Python
-* MySQL
-* PyMySQL
-* FastAPI — to be introduced during backend development
-* Git / GitHub
+| Technology | Purpose                   |
+| ---------- | ------------------------- |
+| Python     | Backend programming       |
+| MySQL      | Relational database       |
+| PyMySQL    | Python-MySQL connectivity |
+| FastAPI    | REST API framework        |
+| Git        | Version control           |
+| GitHub     | Remote repository         |
 
 ---
 
 ## 4. High-Level Architecture
 
-```text
+```
 Client
-   |
-   v
-Python Backend
-   |
-   v
+   │
+   ▼
+FastAPI / Python Backend
+   │
+   ▼
 PyMySQL
-   |
-   v
+   │
+   ▼
 MySQL Database
 ```
 
-The database will contain the core business data, while Python will handle application logic, validation, authentication, and API functionality.
+The backend will contain the business logic and communicate with MySQL through PyMySQL.
 
 ---
 
@@ -53,12 +76,7 @@ The database will contain the core business data, while Python will handle appli
 
 ## 5.1 Roles
 
-The `roles` table stores the roles available in the system.
-
-### Current Roles
-
-* `customer`
-* `admin`
+The `roles` table defines the roles available in the application.
 
 ```text
 roles
@@ -66,21 +84,37 @@ roles
 └── role_name
 ```
 
+### Fields
+
+| Field     | Type        | Constraints        |
+| --------- | ----------- | ------------------ |
+| role_id   | INT         | PK, AUTO_INCREMENT |
+| role_name | VARCHAR(20) | NOT NULL, UNIQUE   |
+
+### Initial Roles
+
+* customer
+* admin
+
 ### Relationship
 
-```text
-roles 1 ──────────< users
+```
+roles 1 ───── N users
 ```
 
-One role can be assigned to many users.
+A role can belong to many users.
+
+Normal user registration should assign the `customer` role.
+
+Users must not be allowed to register themselves as administrators.
 
 ---
 
 ## 5.2 Users
 
-The `users` table stores customer and administrator accounts.
+The `users` table stores customer and administrator account information.
 
-```text
+```
 users
 ├── user_id
 ├── first_name
@@ -94,35 +128,48 @@ users
 └── updated_at
 ```
 
-### Constraints
+### Fields
 
-* `user_id` — Primary Key, Auto Increment
-* `first_name` — NOT NULL
-* `last_name` — NOT NULL
-* `email` — UNIQUE, NOT NULL
-* `password_hash` — NOT NULL
-* `phone` — UNIQUE, NOT NULL
-* `dob` — NOT NULL
-* `role_id` — Foreign Key referencing `roles.role_id`
-* `created_at` — automatically stores account creation time
-* `updated_at` — tracks the latest modification
+| Field         | Type         | Constraints               |
+| ------------- | ------------ | ------------------------- |
+| user_id       | INT          | PK, AUTO_INCREMENT        |
+| first_name    | VARCHAR(50)  | NOT NULL                  |
+| last_name     | VARCHAR(50)  | NOT NULL                  |
+| email         | VARCHAR(100) | NOT NULL, UNIQUE          |
+| password_hash | VARCHAR(...) | NOT NULL                  |
+| phone         | VARCHAR(20)  | NOT NULL, UNIQUE          |
+| dob           | DATE         | NOT NULL                  |
+| role_id       | INT          | NOT NULL, FK              |
+| created_at    | DATETIME     | DEFAULT CURRENT_TIMESTAMP |
+| updated_at    | DATETIME     | DEFAULT CURRENT_TIMESTAMP |
 
-### Design Decisions
+### Password Rules
 
-* Passwords will not be stored directly.
-* The backend will validate password complexity.
-* The backend will hash passwords before storing them.
-* Phone numbers will be stored as `VARCHAR`, not a numeric data type.
-* `dob` is stored instead of `age` because age is derived data and changes over time.
-* New registrations will default to the `customer` role.
-* Admin privileges will not be assigned through normal customer registration.
-* `updated_at` will eventually be maintained automatically.
+Passwords must satisfy the following requirements:
+
+* Minimum 8 characters
+* At least 1 numeric character
+* At least 1 uppercase character
+* At least 1 lowercase character
+* At least 1 special character
+
+Password complexity will be validated in Python.
+
+Only the password hash will be stored in the database.
+
+Plain-text passwords must never be stored.
+
+### Relationship
+
+```
+roles 1 ───── N users
+```
 
 ---
 
 ## 5.3 Categories
 
-The `categories` table groups products into logical categories.
+The `categories` table stores product categories.
 
 ```text
 categories
@@ -132,37 +179,35 @@ categories
 └── created_at
 ```
 
-### Constraints
+### Fields
 
-* `category_id` — Primary Key, Auto Increment
-* `category_name` — UNIQUE, NOT NULL
-* `description` — Optional
-* `created_at` — automatically stores creation time
+| Field         | Type         | Constraints               |
+| ------------- | ------------ | ------------------------- |
+| category_id   | INT          | PK, AUTO_INCREMENT        |
+| category_name | VARCHAR(100) | NOT NULL, UNIQUE          |
+| description   | VARCHAR(255) | NULL                      |
+| created_at    | DATETIME     | DEFAULT CURRENT_TIMESTAMP |
 
 ### Example Categories
 
-```text
-Electronics
-Clothing
-Books
-Home & Kitchen
-Beauty
-Sports
-```
+* Electronics
+* Clothing
+* Books
+* Home & Kitchen
+* Beauty
+* Sports
 
 ### Relationship
 
 ```text
-categories 1 ──────────< products
+categories 1 ───── N products
 ```
-
-One category can contain many products.
 
 ---
 
 ## 5.4 Products
 
-The `products` table stores the products available in the store.
+The `products` table stores products available in the store.
 
 ```text
 products
@@ -178,127 +223,735 @@ products
 └── updated_at
 ```
 
-### Constraints
+### Fields
 
-* `product_id` — Primary Key, Auto Increment
-* `product_name` — NOT NULL
-* `description` — Optional
-* `sku` — UNIQUE, NOT NULL
-* `price` — NOT NULL
-* `stock_quantity` — NOT NULL and must not be negative
-* `category_id` — Foreign Key referencing `categories.category_id`
-* `is_active` — defaults to TRUE
-* `created_at` — automatically stores creation time
-* `updated_at` — tracks the latest modification
+| Field          | Type          | Constraints               |
+| -------------- | ------------- | ------------------------- |
+| product_id     | INT           | PK, AUTO_INCREMENT        |
+| product_name   | VARCHAR(150)  | NOT NULL                  |
+| description    | TEXT          | NULL                      |
+| sku            | VARCHAR(50)   | NOT NULL, UNIQUE          |
+| price          | DECIMAL(10,2) | NOT NULL, >= 0            |
+| stock_quantity | INT           | NOT NULL, >= 0            |
+| category_id    | INT           | NOT NULL, FK              |
+| is_active      | BOOLEAN       | DEFAULT TRUE              |
+| created_at     | DATETIME      | DEFAULT CURRENT_TIMESTAMP |
+| updated_at     | DATETIME      | DEFAULT CURRENT_TIMESTAMP |
 
-### Design Decisions
+### Important Decisions
 
-#### Price
+`DECIMAL` will be used for product prices instead of `FLOAT` because prices require accurate decimal representation.
 
-`DECIMAL(10,2)` will be used for product prices because monetary values require exact decimal precision.
+Stock quantity must never be negative.
 
-We will not use `FLOAT` for prices.
+Products will generally not be physically deleted after being used by orders.
 
-#### SKU
+Instead, `is_active` can be set to `FALSE`.
 
-SKU stands for **Stock Keeping Unit**.
+This allows historical orders to continue referencing products.
 
-Each product will have a unique SKU.
+### Relationship
+
+```
+categories 1 ───── N products
+```
+
+---
+
+## 5.5 Cart
+
+The `cart` table represents a user's active shopping cart.
+
+```
+cart
+├── cart_id
+├── user_id
+├── created_at
+└── updated_at
+```
+
+### Fields
+
+| Field      | Type     | Constraints               |
+| ---------- | -------- | ------------------------- |
+| cart_id    | INT      | PK, AUTO_INCREMENT        |
+| user_id    | INT      | NOT NULL, UNIQUE, FK      |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP |
+| updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP |
+
+### Business Rule
+
+Each user has one active cart.
+
+The `UNIQUE` constraint on `user_id` enforces:
+
+```
+One user → One active cart
+```
+
+### Relationship
+
+```
+users 1 ───── 1 cart
+```
+
+---
+
+## 5.6 Cart Items
+
+The `cart_items` table stores products currently present in a user's cart.
+
+```
+cart_items
+├── cart_item_id
+├── cart_id
+├── product_id
+├── quantity
+└── added_at
+```
+
+### Fields
+
+| Field        | Type     | Constraints               |
+| ------------ | -------- | ------------------------- |
+| cart_item_id | INT      | PK, AUTO_INCREMENT        |
+| cart_id      | INT      | NOT NULL, FK              |
+| product_id   | INT      | NOT NULL, FK              |
+| quantity     | INT      | NOT NULL, > 0             |
+| added_at     | DATETIME | DEFAULT CURRENT_TIMESTAMP |
+
+### Important Constraint
+
+The combination of `cart_id` and `product_id` must be unique.
+
+```
+UNIQUE(cart_id, product_id)
+```
+
+This prevents the same product from appearing multiple times in the same cart.
+
+Instead, the quantity should be updated.
+
+### Stock Rule
+
+Adding a product to a cart does **not** reduce stock.
+
+Stock will be checked and reduced when an order is placed.
+
+### Relationships
+
+```
+cart 1 ───── N cart_items
+
+products 1 ───── N cart_items
+```
+
+`cart_items` resolves the many-to-many relationship between carts and products.
+
+---
+
+## 5.7 Orders
+
+The `orders` table represents completed or in-progress purchases.
+
+```
+orders
+├── order_id
+├── user_id
+├── order_status
+├── total_amount
+├── shipping_address
+├── payment_method
+├── payment_status
+├── created_at
+└── updated_at
+```
+
+### Fields
+
+| Field            | Type          | Constraints               |
+| ---------------- | ------------- | ------------------------- |
+| order_id         | INT           | PK, AUTO_INCREMENT        |
+| user_id          | INT           | NOT NULL, FK              |
+| order_status     | VARCHAR(...)  | NOT NULL                  |
+| total_amount     | DECIMAL(10,2) | NOT NULL, >= 0            |
+| shipping_address | TEXT          | NOT NULL                  |
+| payment_method   | VARCHAR(...)  | NOT NULL                  |
+| payment_status   | VARCHAR(...)  | NOT NULL                  |
+| created_at       | DATETIME      | DEFAULT CURRENT_TIMESTAMP |
+| updated_at       | DATETIME      | DEFAULT CURRENT_TIMESTAMP |
+
+### Order Statuses
+
+The initial order lifecycle will be:
+
+```
+pending
+   ↓
+confirmed
+   ↓
+shipped
+   ↓
+delivered
+```
+
+An order can also become:
+
+```
+cancelled
+```
+
+The status system will remain intentionally simple for this project.
+
+### Shipping Address
+
+The shipping address will be stored directly on the order as a snapshot.
+
+This means an old order retains the address used when the order was placed, even if the user changes their address later.
+
+A separate address-management table is intentionally avoided to keep the project compact.
+
+### Payment
+
+No real payment gateway will be implemented initially.
+
+The project will only track:
+
+#### Payment Methods
+
+* COD
+* CARD
+* UPI
+
+#### Payment Statuses
+
+* pending
+* paid
+* failed
+
+Actual payment processing can be added in a future version.
+
+### Relationship
+
+```text
+users 1 ───── N orders
+```
+
+A user can have multiple orders.
+
+---
+
+## 5.8 Order Items
+
+The `order_items` table stores the products included in each order.
+
+```
+order_items
+├── order_item_id
+├── order_id
+├── product_id
+├── quantity
+├── unit_price
+└── subtotal
+```
+
+### Fields
+
+| Field         | Type          | Constraints        |
+| ------------- | ------------- | ------------------ |
+| order_item_id | INT           | PK, AUTO_INCREMENT |
+| order_id      | INT           | NOT NULL, FK       |
+| product_id    | INT           | NOT NULL, FK       |
+| quantity      | INT           | NOT NULL, > 0      |
+| unit_price    | DECIMAL(10,2) | NOT NULL, >= 0     |
+| subtotal      | DECIMAL(10,2) | NOT NULL, >= 0     |
+
+### Price Snapshot
+
+`unit_price` stores the product price at the time of purchase.
 
 Example:
 
-```text
-IPH15-BLK-128
-TSHIRT-BLU-M
-SONY-WH1000XM5
+```
+Product price when purchased = ₹1000
+
+quantity = 2
+unit_price = ₹1000
+subtotal = ₹2000
 ```
 
-#### Stock
+If the product price later changes to ₹1200, the existing order must still retain the original ₹1000 price.
 
-`stock_quantity` represents the number of units currently available.
+Therefore, order history does not depend on the current product price.
 
-Negative stock will not be allowed.
-
-#### Active Products
-
-Products will have an `is_active` flag.
-
-Instead of deleting a product that is no longer sold:
+### Subtotal
 
 ```text
-is_active = FALSE
+subtotal = quantity × unit_price
 ```
 
-This allows historical orders to continue referencing the product.
+### Relationships
 
----
+```
+orders 1 ───── N order_items
 
-# 6. Current Entity Relationship Overview
-
-```text
-                    ┌──────────────┐
-                    │    roles     │
-                    ├──────────────┤
-                    │ role_id  PK  │
-                    │ role_name    │
-                    └──────┬───────┘
-                           │
-                           │ 1:N
-                           │
-                    ┌──────▼───────┐
-                    │    users     │
-                    ├──────────────┤
-                    │ user_id  PK  │
-                    │ role_id  FK  │
-                    │ first_name   │
-                    │ last_name    │
-                    │ email        │
-                    │ password_hash│
-                    │ phone        │
-                    │ dob          │
-                    │ created_at   │
-                    │ updated_at   │
-                    └──────────────┘
-
-
-                    ┌──────────────┐
-                    │  categories  │
-                    ├──────────────┤
-                    │ category_id  │
-                    │ category_name│
-                    │ description  │
-                    │ created_at   │
-                    └──────┬───────┘
-                           │
-                           │ 1:N
-                           │
-                    ┌──────▼───────┐
-                    │   products   │
-                    ├──────────────┤
-                    │ product_id   │
-                    │ category_id  │
-                    │ product_name │
-                    │ description  │
-                    │ sku          │
-                    │ price        │
-                    │ stock        │
-                    │ is_active    │
-                    │ created_at   │
-                    │ updated_at   │
-                    └──────────────┘
+products 1 ───── N order_items
 ```
 
 ---
 
-# 7. Development Approach
+# 6. Complete Database Relationships
 
-The project will be developed incrementally.
+```
+roles
+  │
+  │ 1:N
+  ▼
+users
+  │
+  ├──────── 1:1 ──────── cart
+  │                       │
+  │                       │ 1:N
+  │                       ▼
+  │                  cart_items
+  │                       │
+  │                       │ N:1
+  │                       ▼
+  │                    products
+  │                       ▲
+  │                       │ N:1
+  │                       │
+  │                   categories
+  │
+  │ 1:N
+  ▼
+orders
+  │
+  │ 1:N
+  ▼
+order_items
+  │
+  │ N:1
+  ▼
+products
+```
 
-New folders and files will be created only when they become necessary.
+---
 
-Git will be used throughout development to track meaningful changes.
+# 7. Database Constraints
+
+The database will enforce important data-integrity rules.
+
+### Primary Keys
+
+Every table will have a primary key.
+
+### Unique Constraints
+
+The following values must be unique:
+
+* `roles.role_name`
+* `users.email`
+* `users.phone`
+* `categories.category_name`
+* `products.sku`
+* `cart.user_id`
+* `(cart_items.cart_id, cart_items.product_id)`
+
+### Foreign Keys
+
+Foreign-key relationships will be used to maintain referential integrity.
+
+### Value Constraints
+
+The database should prevent invalid values such as:
 
 ```text
+price < 0
+stock_quantity < 0
+quantity <= 0
+total_amount < 0
+unit_price < 0
+subtotal < 0
+```
+
+---
+
+# 8. Foreign Key Delete Strategy
+
+Historical business data should not be accidentally deleted through cascading deletes.
+
+Products used by historical orders should not be physically deleted.
+
+Instead:
+
+```
+products.is_active = FALSE
+```
+
+will be used to deactivate products.
+
+Foreign-key relationships will therefore be designed carefully rather than applying `ON DELETE CASCADE` everywhere.
+
+---
+
+# 9. Triggers
+
+Triggers will be used selectively where database-level automation is useful.
+
+## Planned Trigger 1 — User Timestamp
+
+Automatically update:
+
+```
+users.updated_at
+```
+
+when a user record is modified.
+
+## Planned Trigger 2 — Product Timestamp
+
+Automatically update:
+
+```
+products.updated_at
+```
+
+when a product record is modified.
+
+## Planned Trigger 3 — Cart Timestamp
+
+Automatically update:
+
+```
+cart.updated_at
+```
+
+when cart data changes.
+
+## Planned Trigger 4 — Order Timestamp
+
+Automatically update:
+
+```
+orders.updated_at
+```
+
+when an order record is modified.
+
+## Planned Trigger 5 — Order Item Subtotal
+
+When an order item is inserted or updated:
+
+```
+subtotal = quantity × unit_price
+```
+
+can be maintained automatically.
+
+### Stock Management Decision
+
+Stock reduction will **not** be handled by a simple order-item trigger.
+
+Instead, stock management will be handled inside a Python database transaction.
+
+Reason:
+
+```text
+Check stock
+    ↓
+Create order
+    ↓
+Create order items
+    ↓
+Reduce stock
+    ↓
+Commit transaction
+```
+
+This provides better control over order placement and future cancellation/refund logic.
+
+---
+
+# 10. Views
+
+Two useful database views are planned.
+
+## 10.1 Active Products View
+
+A view for retrieving active products.
+
+It can include relevant category information and only expose products where:
+
+```
+is_active = TRUE
+```
+
+This will simplify product listing queries.
+
+## 10.2 Order Summary View
+
+A view combining order and related information for easier reporting.
+
+Possible information:
+
+* Order ID
+* Customer
+* Order status
+* Number of items
+* Total amount
+* Order date
+
+This will provide practice with:
+
+* JOIN
+* GROUP BY
+* Aggregate functions
+
+---
+
+# 11. Seed Data
+
+Initial seed data will be inserted for development and testing.
+
+## Roles
+
+```
+customer
+admin
+```
+
+## Categories
+
+```
+Electronics
+Clothing
+Books
+Home & Kitchen
+Beauty
+Sports
+```
+
+## Example Products
+
+```
+Wireless Mouse
+Mechanical Keyboard
+T-Shirt
+Running Shoes
+Python Book
+Water Bottle
+```
+
+The seed dataset will remain small and focused on development/testing.
+
+---
+
+# 12. Order Processing Flow
+
+The expected order-placement flow is:
+
+```
+User
+  ↓
+Cart
+  ↓
+Cart Items
+  ↓
+Place Order
+  ↓
+Validate Cart
+  ↓
+Check Product Availability
+  ↓
+Check Stock
+  ↓
+Create Order
+  ↓
+Create Order Items
+  ↓
+Calculate / Store Order Total
+  ↓
+Reduce Product Stock
+  ↓
+Clear Cart
+  ↓
+Commit Transaction
+```
+
+If any critical step fails:
+
+```
+ROLLBACK
+```
+
+This prevents partially created orders.
+
+---
+
+# 13. Authentication
+
+Authentication will be implemented in the Python backend.
+
+### Registration
+
+```
+User Input
+    ↓
+Validate Input
+    ↓
+Validate Password Complexity
+    ↓
+Hash Password
+    ↓
+Store User
+```
+
+### Login
+
+```
+Email + Password
+       ↓
+Find User
+       ↓
+Verify Password Hash
+       ↓
+Authenticate User
+```
+
+Authorization will use the user's role.
+
+Example:
+
+```
+customer → customer functionality
+admin    → administrative functionality
+```
+
+---
+
+# 14. Backend Components
+
+The backend will eventually contain functionality for:
+
+## User Management
+
+* Registration
+* Login
+* User retrieval
+* User updates
+* Role-based authorization
+
+## Category Management
+
+* Create category
+* Read categories
+* Update category
+* Deactivate/delete category where appropriate
+
+## Product Management
+
+* Create product
+* Read products
+* Update product
+* Deactivate product
+* Stock management
+
+## Cart Management
+
+* Create/retrieve cart
+* Add product
+* Update quantity
+* Remove product
+* View cart
+
+## Order Management
+
+* Place order
+* View orders
+* View order details
+* Update order status
+* Handle cancellation according to business rules
+
+## Admin Functionality
+
+* Manage products
+* Manage categories
+* View orders
+* Update order status
+* Manage inventory
+
+---
+
+# 15. Transaction Strategy
+
+Database transactions will be used for operations that modify multiple related records.
+
+The most important example is order placement.
+
+```
+BEGIN TRANSACTION
+
+Check stock
+Create order
+Create order items
+Update product stock
+Clear cart
+
+COMMIT
+```
+
+If an operation fails:
+
+```
+ROLLBACK
+```
+
+This prevents inconsistent states such as:
+
+```
+Order created
+but
+Stock not updated
+```
+
+---
+
+# 16. Project Structure
+
+The project structure will evolve as development progresses.
+
+Current structure:
+
+```
+ShopSphere/
+└── docs/
+    └── architecture.md
+```
+
+Planned structure:
+
+```text
+ShopSphere/
+├── docs/
+│   └── architecture.md
+├── database/
+├── backend/
+├── tests/
+├── .gitignore
+├── requirements.txt
+└── README.md
+```
+
+Files and folders will be added only when they are needed.
+
+---
+
+# 17. Development Approach
+
+The project will follow this workflow:
+
+```
 Learn
   ↓
 Design
@@ -312,147 +965,127 @@ Git Commit
 Next Feature
 ```
 
+The objective is to understand each part rather than simply copying a completed project.
+
 ---
 
-# 8. Planned Database Components
+# 18. Development Timeline
 
-The database will eventually include:
+The initial target is approximately 10 days with around 1–1.5 hours of work per day.
 
-* Tables
-* Primary Keys
-* Foreign Keys
-* Unique Constraints
-* Check Constraints
-* Indexes
+The timeline is flexible and may change depending on learning progress.
+
+### Day 1
+
+* Database planning
+* Git setup
+* Architecture documentation
+
+### Day 2
+
+* Create database tables
+* Primary keys
+* Foreign keys
+* Constraints
+
+### Day 3
+
 * Triggers
 * Views
-* Seed / Sample Data
+* Seed data
+* SQL testing
 
-Only components that provide meaningful functionality or learning value will be added.
+### Day 4
 
----
+* Python setup
+* PyMySQL
+* Database connection
+* Basic CRUD practice
 
-# 9. Planned Backend Components
+### Day 5
 
-## Customer
+* Categories
+* Products
+* Product CRUD
 
+### Day 6
+
+* Users
+* Password hashing
 * Registration
 * Login
-* Browse products
-* Search products
-* View product details
-* Add products to cart
-* Update cart
-* Remove cart items
-* Place orders
-* View order history
+* Authorization
 
-## Admin
+### Day 7
 
-* Manage products
-* Manage categories
-* View orders
-* Update order status
-* Manage store inventory
+* Cart
+* Cart items
+* Cart operations
+
+### Day 8
+
+* Orders
+* Order items
+* Transactions
+* Stock handling
+
+### Day 9
+
+* Admin functionality
+* Validation
+* Error handling
+
+### Day 10
+
+* Testing
+* Documentation
+* Cleanup
+* Git/GitHub
+* Final review
 
 ---
 
-# 10. Project Structure
+# 19. Current Status
 
-The project structure will evolve as development progresses.
+Database design has been completed conceptually.
 
-Files and folders will be created only when they are required.
+### Designed Tables
 
-Current structure:
+* `roles`
+* `users`
+* `categories`
+* `products`
+* `cart`
+* `cart_items`
+* `orders`
+* `order_items`
+
+### Designed Database Features
+
+* Primary keys
+* Foreign keys
+* Unique constraints
+* Value constraints
+* Relationships
+* Triggers
+* Views
+* Seed data
+* Transactions
+* Stock management strategy
+
+### Current Phase
 
 ```text
-ShopSphere/
-│
-└── docs/
-    └── architecture.md
+Database Design
+      ✓
+      ↓
+SQL Implementation
+      ↓
+Python + MySQL
+      ↓
+Backend Development
+      ↓
+Testing
 ```
 
-Planned structure:
-
-```text
-ShopSphere/
-│
-├── docs/
-│
-├── database/
-│
-├── backend/
-│
-├── tests/
-│
-├── .gitignore
-├── requirements.txt
-└── README.md
-```
-
----
-
-# 11. Current Status
-
-## Database Design
-
-* [x] Roles table — designed
-* [x] Users table — designed
-* [x] Categories table — designed
-* [x] Products table — designed
-* [ ] Cart
-* [ ] Cart Items
-* [ ] Orders
-* [ ] Order Items
-* [ ] Additional tables if required
-
-## Database Implementation
-
-* [ ] Schema
-* [ ] Constraints
-* [ ] Indexes
-* [ ] Triggers
-* [ ] Views
-* [ ] Seed Data
-
-## Backend
-
-* [ ] Python project setup
-* [ ] PyMySQL connection
-* [ ] Database access layer
-* [ ] API structure
-* [ ] Authentication
-* [ ] Product APIs
-* [ ] Cart APIs
-* [ ] Order APIs
-* [ ] Admin APIs
-
-## Documentation
-
-* [x] Initial architecture document
-* [ ] Database documentation
-* [ ] API documentation
-* [ ] Final README
-
----
-
-# 12. Development Timeline
-
-Target completion time: **10 days**
-
-Approximately **1–1.5 hours per day**.
-
-| Day    | Goal                                 |
-| ------ | ------------------------------------ |
-| Day 1  | Database planning + Git setup        |
-| Day 2  | Tables + relationships + constraints |
-| Day 3  | Triggers + views + seed data         |
-| Day 4  | Python + PyMySQL connection          |
-| Day 5  | Products + categories backend        |
-| Day 6  | Users + authentication               |
-| Day 7  | Cart                                 |
-| Day 8  | Orders                               |
-| Day 9  | Admin + validation + error handling  |
-| Day 10 | Testing + documentation + cleanup    |
-
-The timeline is flexible. Understanding the project is more important than strictly completing a task on a particular day.
+The next implementation step is to create the MySQL database and begin writing the SQL schema.

@@ -125,7 +125,8 @@ users
 ├── dob
 ├── role_id
 ├── created_at
-└── updated_at
+├── updated_at
+└── is_active
 ```
 
 ### Fields
@@ -142,6 +143,7 @@ users
 | role_id       | INT          | NOT NULL, FK              |
 | created_at    | DATETIME     | DEFAULT CURRENT_TIMESTAMP |
 | updated_at    | DATETIME     | DEFAULT CURRENT_TIMESTAMP |
+| is_active     | BOOLEAN      | NOT NULL, DEFAULT TRUE    |
 
 ### Password Rules
 
@@ -158,6 +160,16 @@ Password complexity will be validated in Python.
 Only the password hash will be stored in the database.
 
 Plain-text passwords must never be stored.
+
+### Account Deactivation
+
+Users will not be physically deleted from the database.
+
+Instead, account deletion will be implemented as soft deletion by setting:
+
+```text
+is_active = FALSE
+```
 
 ### Relationship
 
@@ -593,6 +605,14 @@ will be used to deactivate products.
 
 Foreign-key relationships will therefore be designed carefully rather than applying `ON DELETE CASCADE` everywhere.
 
+```
+Users will also not be physically deleted when they request account deletion.
+
+Instead:
+
+```text
+users.is_active = FALSE
+```
 ---
 
 # 9. Triggers
@@ -922,11 +942,11 @@ Stock not updated
 The project structure will evolve as development progresses.
 
 Current structure:
-
 ```
 ShopSphere/
-└── docs/
-    └── architecture.md
+├── docs/
+│   └── architecture.md
+└── database/
 ```
 
 Planned structure:
@@ -1047,7 +1067,8 @@ The timeline is flexible and may change depending on learning progress.
 
 # 19. Current Status
 
-Database design has been completed conceptually.
+```markdown
+Database design has been completed conceptually, with user account deactivation handled through the `users.is_active` field.
 
 ### Designed Tables
 

@@ -1109,4 +1109,8 @@ Backend Development
 Testing
 ```
 
-The next implementation step is to create the MySQL database and begin writing the SQL schema.
+The MySQL database, tables, constraints, triggers, views,
+seed data, and initial testing have been completed.
+
+The next implementation step is to set up Python
+and connect to MySQL using PyMySQL.

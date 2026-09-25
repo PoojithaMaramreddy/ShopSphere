@@ -1,8 +1,8 @@
 import hashlib
 import secrets
 
-from db_connection import get_connection
-from validation import (
+from backend.db_connection import get_connection
+from backend.validation import (
     validate_name,
     validate_email,
     validate_phone,

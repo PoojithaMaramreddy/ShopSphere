@@ -1,4 +1,4 @@
-from db_connection import get_connection
+from backend.db_connection import get_connection
 
 def get_all_products():
     connection = get_connection()

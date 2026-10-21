@@ -1,99 +1,199 @@
 
 # ShopSphere — E-Commerce Backend System
 
-**ShopSphere** is a backend-focused e-commerce project built with **Python and MySQL**. It implements core shopping workflows—from managing users and products to maintaining carts and placing orders—using Python business logic and a relational database.
+ShopSphere is a backend-focused e-commerce system developed using **Python and MySQL**. It implements essential shopping operations, including user management, product management, shopping carts, order processing, and inventory updates.
 
-The project emphasizes database integrity, input validation, stock management, and automated testing. It is **not** a web application: there is no frontend or FastAPI layer.
+The project demonstrates practical backend development through Python business logic, relational database design, data validation, transaction handling, and automated testing.
 
 ## Tech Stack
 
-- **Language:** Python
+- **Programming Language:** Python
 - **Database:** MySQL
-- **Database connectivity:** PyMySQL
-- **Testing:** pytest
-- **Version control:** Git and GitHub
+- **Database Connectivity:** PyMySQL
+- **Testing Framework:** pytest
+- **Version Control:** Git and GitHub
 
-## Core Features
+## Key Features
 
-| Module | Capabilities |
-| --- | --- |
-| **Users** | Registration, password validation and hashing, role-based records, profile operations, account activation/deactivation |
-| **Categories** | Create, read, update, and delete categories |
-| **Products** | Product management, deactivation, and stock handling |
-| **Cart** | Add, update, and remove items; view contents and calculate totals |
-| **Orders** | Create orders from carts, verify stock, reduce inventory, create order items, calculate totals, clear carts after successful orders, and update order/payment statuses |
+### 1. User Management
+- User registration and profile management
+- Password validation and hashing
+- Role-based user records
+- Account activation and deactivation
 
-## Architecture
+### 2. Category and Product Management
+- Create, retrieve, update, and delete categories
+- Add, retrieve, and update products
+- Product deactivation
+- Inventory and stock management
+
+### 3. Shopping Cart
+- Add products to the cart
+- Update product quantities
+- Remove items from the cart
+- Retrieve cart details
+- Calculate cart totals
+
+### 4. Order Management
+- Generate orders from shopping cart items
+- Validate product availability and stock
+- Create order and order-item records
+- Reduce inventory after order creation
+- Calculate order totals
+- Clear the cart after successful order creation
+- Retrieve customer orders and order details
+- Update order and payment statuses
+
+## System Architecture
+
+ShopSphere follows a modular Python backend architecture connected directly to a MySQL database using PyMySQL.
 
 ```text
-Python backend modules
-         |
-       PyMySQL
-         |
-         v
-    MySQL database
+          Python Backend
+                 |
+      Business Logic & Validation
+                 |
+              PyMySQL
+                 |
+                 v
+            MySQL Database
 ```
 
-Python handles application logic and communicates directly with MySQL through PyMySQL.
+The Python modules handle application operations, while MySQL manages persistent data storage and relational integrity.
 
 ## Database Design
 
-The relational database models these entities:
+The relational database contains eight primary tables:
 
-`roles` · `users` · `categories` · `products` · `cart` · `cart_items` · `orders` · `order_items`
+| Table | Purpose |
+|-------|---------|
+| roles | Stores user roles |
+| users | Stores customer and user information |
+| categories | Organizes product categories |
+| products | Stores product details and inventory |
+| cart | Maintains shopping carts |
+| cart_items | Stores products added to carts |
+| orders | Stores customer orders |
+| order_items | Stores individual items within orders |
 
-The schema uses primary and foreign keys, unique and check constraints, defaults, and transactions to support data integrity. It also includes:
+### Database Concepts Implemented
 
-- **Triggers** for update timestamps and order-item subtotal calculations.
-- **Views** such as `active_products_view` and `order_summary_view` for commonly needed queries.
+- Primary and foreign keys
+- Unique and check constraints
+- Default values
+- Database transactions
+- Triggers
+- Views
+- Relational data integrity
+
+### Database Triggers
+
+Triggers support automatic timestamp updates and order-item subtotal calculations.
+
+Examples:
+- `user_update`
+- `products_update`
+- `cart_update`
+- `orders_update`
+- `order_items_insert`
+- `order_items_update`
+
+### Database Views
+
+- `active_products_view`
+- `order_summary_view`
+
+These views simplify access to commonly required product and order information.
 
 ## Order Processing Workflow
 
-1. Read the customer's cart items.
-2. Check product availability and stock.
-3. Create the order and its order-item records.
-4. Update inventory and calculate the order total.
-5. Clear the cart after successful order creation.
+The order management module coordinates several backend operations:
 
-These steps are implemented in the Python backend with MySQL persistence.
+1. Retrieve items from the customer's shopping cart.
+2. Check product availability and stock quantities.
+3. Create the order and corresponding order-item records.
+4. Calculate the order total.
+5. Update product inventory.
+6. Clear the shopping cart after successful order creation.
+
+This workflow demonstrates coordination between Python business logic and related MySQL tables.
 
 ## Automated Testing
 
-The project includes a **pytest** suite covering:
+ShopSphere uses **pytest** for automated testing.
 
-- User operations and validation
-- Categories and products
-- Cart functionality
+The test suite covers six functional areas:
+
+- User management
+- Input validation
+- Category operations
+- Product operations
+- Shopping cart functionality
 - Order processing
 
-**Documented test result:** `48 passed`
+### Test Results
 
-To run the tests from the repository root after configuring the project dependencies and database environment:
+**48 tests passed** in the documented final test run.
+
+To execute the tests from the project root:
 
 ```bash
 pytest
 ```
 
-> The test count above reflects the project's documented result; it is not a live CI status badge.
+Test execution requires the appropriate Python dependencies and database configuration.
 
-## Repository Structure
+## Project Structure
 
 ```text
 ShopSphere/
-├── backend/          # Python database connection and business logic
-├── docs/             # Project documentation
-├── tests/            # pytest test suite
-├── requirements.txt  # Python dependencies
-├── .gitignore
-└── README.md
+|
+|-- backend/
+|   |-- db_connection.py
+|   |-- users.py
+|   |-- categories.py
+|   |-- products.py
+|   |-- cart.py
+|   |-- orders.py
+|
+|-- docs/
+|
+|-- tests/
+|   |-- test_users.py
+|   |-- test_validation.py
+|   |-- test_categories.py
+|   |-- test_products.py
+|   |-- test_cart.py
+|   |-- test_orders.py
+|
+|-- requirements.txt
+|-- .gitignore
+|-- README.md
 ```
 
-## Project Scope and Status
+## Project Scope
 
-**Status:** Core implementation completed.
+ShopSphere is a backend-only implementation focused on Python programming and relational database operations.
 
-ShopSphere is a Python + MySQL backend learning project designed to demonstrate relational database modeling, practical business logic, validation, and automated testing. It intentionally does **not** include a frontend, REST API, or FastAPI framework.
+It does not include a frontend, REST API, or web framework.
 
-## Key Skills Demonstrated
+The project is intended to demonstrate backend business logic, database connectivity, validation, and testing rather than a deployed e-commerce website.
 
-Python · SQL · MySQL · PyMySQL · Relational Database Design · Transactions · Input Validation · Business Logic · pytest · Git
+## Project Status
+
+**Completed — Core Backend Implementation**
+
+The primary backend modules, database functionality, and automated tests have been implemented.
+
+## Skills Demonstrated
+
+- Python backend development
+- SQL and relational database design
+- MySQL database integration
+- PyMySQL
+- CRUD operations
+- Input validation and error handling
+- Inventory and order processing
+- Database constraints, triggers, views, and transactions
+- Automated testing with pytest
+- Git and GitHub version control

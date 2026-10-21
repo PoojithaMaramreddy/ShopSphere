@@ -1,226 +1,68 @@
-# ShopSphere — E-Commerce Database & Python Backend
+ShopSphere — E-Commerce Backend System
+ShopSphere is a backend-focused e-commerce project built with Python and MySQL. It implements core shopping workflows—from managing users and products to maintaining carts and placing orders—using Python business logic and a relational database.
 
-ShopSphere is a small e-commerce learning project built using **Python and MySQL**.
+The project emphasizes database integrity, input validation, stock management, and automated testing. It is not a web application: there is no frontend or FastAPI layer.
+Tech Stack
+- Language: Python
+- Database: MySQL
+- Database connectivity: PyMySQL
+- Testing: pytest
+- Version control: Git and GitHub
+Core Features
+Module	Capabilities
+Users	Registration, password validation and hashing, role-based records, profile operations, account activation/deactivation
+Categories	Create, read, update, and delete categories
+Products	Product management, deactivation, and stock handling
+Cart	Add, update, and remove items; view contents and calculate totals
+Orders	Create orders from carts, verify stock, reduce inventory, create order items, calculate totals, clear carts after successful orders, and update order/payment statuses
 
-The project focuses on learning how to design a relational database, connect Python to MySQL, implement backend business logic, validate data, write tests, and manage the project with Git and GitHub.
 
-## 🎯 Project Goals
+Architecture
+Python backend modules
+         |
+       PyMySQL
+         |
+         v
+    MySQL database
+Python handles application logic and communicates directly with MySQL through PyMySQL.
+Database Design
+The relational database models these entities:
 
-* Design and implement a relational MySQL database
-* Understand tables, relationships, primary keys, and foreign keys
-* Use constraints, triggers, and views
-* Connect Python with MySQL using PyMySQL
-* Implement e-commerce business logic in Python
-* Practice validation and error handling
-* Write automated tests using pytest
-* Practice Git and GitHub workflow
+roles · users · categories · products · cart · cart_items · orders · order_items
 
-## 🛠️ Tech Stack
+The schema uses primary and foreign keys, unique and check constraints, defaults, and transactions to support data integrity. It also includes:
+- Triggers for update timestamps and order-item subtotal calculations.
+- Views such as active_products_view and order_summary_view for commonly needed queries.
+Order Processing Workflow
+1. Read the customer's cart items.
+2. Check product availability and stock.
+3. Create the order and its order-item records.
+4. Update inventory and calculate the order total.
+5. Clear the cart after successful order creation.
+These steps are implemented in the Python backend with MySQL persistence.
+Automated Testing
+The project includes a pytest suite covering:
+- User operations and validation
+- Categories and products
+- Cart functionality
+- Order processing
+Documented test result: 48 passed
 
-* **Python**
-* **MySQL**
-* **PyMySQL**
-* **pytest**
-* **Git**
-* **GitHub**
-
-## 🏗️ Project Architecture
-
-```text
-Python Backend
-      │
-      │ PyMySQL
-      ▼
-MySQL Database
-```
-
-Python contains the application/business logic and communicates with the MySQL database through PyMySQL.
-
-## 🗄️ Database
-
-The ShopSphere database contains the following main tables:
-
-* `roles`
-* `users`
-* `categories`
-* `products`
-* `cart`
-* `cart_items`
-* `orders`
-* `order_items`
-
-The database uses:
-
-* Primary keys
-* Foreign keys
-* Unique constraints
-* Check constraints
-* Default values
-* Transactions
-* Triggers
-* Views
-
-## ⚙️ Database Triggers
-
-The project includes triggers for automatically handling values such as:
-
-* `updated_at` timestamps
-* Order-item `subtotal` calculation
-
-Examples include:
-
-```text
-user_update
-products_update
-cart_update
-orders_update
-order_items_insert
-order_items_update
-```
-
-## 👁️ Database Views
-
-The project includes views for commonly needed information:
-
-* `active_products_view`
-* `order_summary_view`
-
-## 🛒 Main Features
-
-### Users
-
-* User registration
-* Password validation
-* Password hashing
-* Role-based user records
-* User activation/deactivation
-* User profile operations
-
-### Categories
-
-* Create categories
-* Retrieve categories
-* Update categories
-* Delete categories
-
-### Products
-
-* Create products
-* Retrieve products
-* Retrieve all products
-* Update products
-* Deactivate products
-* Stock management
-
-### Cart
-
-* Add products to cart
-* Update cart quantities
-* Remove cart items
-* View cart contents
-* Calculate cart totals
-
-### Orders
-
-* Create orders from cart items
-* Check product stock
-* Reduce stock after order creation
-* Create order items
-* Calculate order totals
-* Clear the cart after successful order creation
-* Retrieve individual orders
-* Retrieve user orders
-* Retrieve order items
-* Update order status
-* Update payment status
-
-## 🧪 Testing
-
-The project uses **pytest** for automated testing.
-
-The test suite covers:
-
-* Users
-* Validation
-* Categories
-* Products
-* Cart
-* Orders
-
-Final test result:
-
-```text
-48 passed
-```
-
-## 📁 Project Structure
-
-```text
-ShopSphere/
-│
-├── backend/
-│   ├── db_connection.py
-│   ├── users.py
-│   ├── categories.py
-│   ├── products.py
-│   ├── cart.py
-│   └── orders.py
-│
-├── tests/
-│   ├── test_users.py
-│   ├── test_validation.py
-│   ├── test_categories.py
-│   ├── test_products.py
-│   ├── test_cart.py
-│   └── test_orders.py
-│
-├── database/
-│   └── ...
-│
-└── README.md
-```
-
-## ▶️ Running the Tests
-
-From the project root:
-
-```bash
+To run the tests from the repository root after configuring the project dependencies and database environment:
 pytest
-```
+The test count above reflects the project's documented result; it is not a live CI status badge.
 
-Expected result:
+Repository Structure
+ShopSphere/
+├── backend/          # Python database connection and business logic
+├── docs/             # Project documentation
+├── tests/            # pytest test suite
+├── requirements.txt  # Python dependencies
+├── .gitignore
+└── README.md
+Project Scope and Status
+Status: Core implementation completed.
 
-```text
-48 passed
-```
-
-## 📚 What I Learned
-
-This project was created primarily as a learning exercise.
-
-Through ShopSphere, I practiced:
-
-* Relational database design
-* SQL and MySQL
-* Foreign-key relationships
-* Database constraints
-* Transactions
-* Triggers and views
-* Python database connectivity
-* Backend business logic
-* Input validation
-* Automated testing with pytest
-* Debugging database-related errors
-* Git and GitHub
-
-## 🚫 Project Scope
-
-ShopSphere is intentionally kept as a **Python + MySQL learning project**.
-
-It does not use FastAPI or a frontend. The focus is on understanding Python backend logic and relational database concepts rather than building a complete production web application.
-
-## 👩‍💻 Project Status
-
-**Completed — Learning Project**
-
-The core database, Python functionality, testing, and Git/GitHub workflow have been implemented and tested successfully.
+ShopSphere is a Python + MySQL backend learning project designed to demonstrate relational database modeling, practical business logic, validation, and automated testing. It intentionally does not include a frontend, REST API, or FastAPI framework.
+Key Skills Demonstrated
+Python · SQL · MySQL · PyMySQL · Relational Database Design · Transactions · Input Validation · Business Logic · pytest · Git
